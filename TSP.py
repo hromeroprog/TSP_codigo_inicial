@@ -121,6 +121,8 @@ class TSP:
         return end-start
         
     
+    
+    
     def opt2(self):
         start = time.time()
         improved = True
