@@ -3,6 +3,9 @@
 Created on Tue May  4 12:43:59 2021
 
 @author: 2rome
+Todo el codigo ha sido generado con el objetivo de que sirva como punto de partida 
+para el trabajo de TSP. Las funciones no han sido especialmente optimizadas
+y se recomienda hacer modificaciones propias en caso de que el analisis genere problemas
 """
 
 from matplotlib import pyplot as plt
