@@ -129,9 +129,8 @@ class TSP:
             best_distance = self.compute_dist()
             for i in range(1, self.dimension - 2):
                 for j in range(i + 2, self.dimension):
-                    #if j - i == 1: continue  # changes nothing, skip then
-                    new_route = self.solution.copy()  # Creates a copy of route
-                    new_route[i:j] = self.solution[j - 1:i - 1:-1]  # this is the 2-optSwap since j >= i we use -1
+                    new_route = self.solution.copy()  
+                    new_route[i:j] = self.solution[j - 1:i - 1:-1]  # operador 2opt
                     new_distance = sum([self.distance(new_route[index], new_route[(index + 1) % len(new_route)]) for index in range(len(new_route))])
 
                     if new_distance < best_distance:
