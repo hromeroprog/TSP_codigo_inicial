@@ -44,25 +44,24 @@ class TSP:
         self.generate_graph()
         self.solution = list(self.problema.keys())
         print(f'Fichero {tsp_name} parseado con exito')
-    
+
     def aplicar_mejor_solucion_desde_archivo(self):
-        if '.tsp'not in self.filename:
+        if '.tsp' not in self.filename:
             print(f'El escenario {self.nombre} no fue generado apartir de un archivo .tsp')
             return
         solution_file = "./TSP_interesantes/" + self.filename.replace('.tsp', '') + ".opt.tour"
         lines = read_file(solution_file)
         index_for_search = [index for index, line in enumerate(lines) if 'TOUR_SECTION' in line][0] + 1
-        
+
         next_line = lines[index_for_search]
-        #if else porque a veces la solucion a parece en una sola linea y a veces en varias
+        # if else porque a veces la solucion a parece en una sola linea y a veces en varias
         if sum([str(city) in next_line for city in self.solution]) == self.dimension:
             self.solution = list(map(int, next_line.split(' ')))
         else:
-            self.solution = list(map(int,lines[index_for_search:index_for_search + self.dimension]))
+            self.solution = list(map(int, lines[index_for_search:index_for_search + self.dimension]))
             print(self.solution)
         self.ordenar_solucion()
         print(f'Solucion desde archivo: {self.compute_dist()} m')
-        
 
     # GENERA UN ESCENARIO ALEATORIO DE {dimension} CIUDADES
     def obtener_random(self, dimension):
@@ -74,9 +73,9 @@ class TSP:
         self.generate_graph()
         self.solution = list(self.problema.keys())
 
-    #PARA DESORDENAR LAS CIUDADES DE LA SOLUCION
-    #puede ser util para evaluar varias soluciones sobre un mismo escenario
-    #pero que una soluciones no influyan sobre las otras
+    # PARA DESORDENAR LAS CIUDADES DE LA SOLUCION
+    # puede ser util para evaluar varias soluciones sobre un mismo escenario
+    # pero que una soluciones no influyan sobre las otras
     def shuffle(self):
         random.shuffle(self.solution)
         self.ordenar_solucion()
@@ -105,7 +104,7 @@ class TSP:
         end = time.time()
         self.ordenar_solucion()
         print(f'Solución greedy generada: {self.compute_dist()}m')
-        return end-start
+        return end - start
 
     # SOLUCION CON ALGORITMO BASADO EN GRADOS RESPECTO AL CENTRO, FUNCIONA BIEN COMBINADO CON 2-OPT
     def r_solve(self):
@@ -118,11 +117,8 @@ class TSP:
         end = time.time()
         self.ordenar_solucion()
         print(f'Solucion r: {self.compute_dist()} m')
-        return end-start
-        
-    
-    
-    
+        return end - start
+
     def opt2(self):
         start = time.time()
         improved = True
@@ -131,9 +127,11 @@ class TSP:
             best_distance = self.compute_dist()
             for i in range(1, self.dimension - 2):
                 for j in range(i + 2, self.dimension):
-                    new_route = self.solution.copy()  
+                    new_route = self.solution.copy()
                     new_route[i:j] = self.solution[j - 1:i - 1:-1]  # operador 2opt
-                    new_distance = sum([self.distance(new_route[index], new_route[(index + 1) % len(new_route)]) for index in range(len(new_route))])
+                    new_distance = sum(
+                        [self.distance(new_route[index], new_route[(index + 1) % len(new_route)]) for index in
+                         range(len(new_route))])
 
                     if new_distance < best_distance:
                         self.solution = new_route
@@ -146,14 +144,15 @@ class TSP:
         end = time.time()
         self.ordenar_solucion()
         print(f'Solucion 2-opt: {self.compute_dist()} m')
-        return end-start
-        
-    
+        return end - start
+
     def backtracking_solve(self):
-        start = time.time()
         answer = []
         paths = []
         graph = self.graph.copy()
+
+        # USED IN DFBnB: Stores best solution found
+        #temp_sol = [float("inf")]
 
         # Boolean array to check if a node
         # has been visited or not
@@ -163,15 +162,24 @@ class TSP:
         v[0] = True
 
         # Find the minimum weight Hamiltonian Cycle
+        start = time.time()
         self.tsp_backtracking(graph, v, 0, self.dimension, 1, 0, answer, "1", paths)
-        print(min(answer))
-
         # Splits solution by separator and converts each element to int to be stored as a list of ints
         self.solution = [int(x) for x in paths[answer.index(min(answer))].split("->")]
         end = time.time()
+        print(min(answer))
+        print(self.solution)
+
+        # USED IN DFBnB: Finds the minimum weight Hamiltonian Cycle using DFBnB
+        # start = time.time()
+        # self.tsp_backtracking_dfbb(graph, v, 0, self.dimension, 1, 0, answer, "1", paths, temp_sol)
+        # self.solution = [int(x) for x in paths[answer.index(min(answer))].split("->")]
+        # end = time.time()
+        # print(min(answer))
+
         self.ordenar_solucion()
         print(f'Solucion backtracking: {self.compute_dist()} m')
-        return end-start
+        return end - start
 
     def tsp_backtracking(self, graph, v, currPos, n, count, cost, answer, path, all_paths):
         if count == n and graph[currPos][0]:
@@ -188,10 +196,32 @@ class TSP:
                 # Mark as visited
                 v[i] = True
                 self.tsp_backtracking(graph, v, i, n, count + 1, cost + graph[currPos][i],
-                                      answer, path + "->" + str(i+1), all_paths)
+                                      answer, path + "->" + str(i + 1), all_paths)
 
                 # Mark ith node as unvisited
                 v[i] = False
+
+    def tsp_backtracking_dfbb(self, graph, v, currPos, n, count, cost, answer, path, all_paths, best_sol):
+        if count == n and graph[currPos][0]:
+            answer.append(cost + graph[currPos][0])
+            # Append local path to all_paths (stores all solutions' paths)
+            all_paths.append(path)
+            best_sol[0] = (cost + graph[currPos][0])
+            return
+        # BACKTRACKING STEP
+        # Loop to traverse the adjacency list
+        # of currPos node and increasing the count
+        # by 1 and cost by graph[currPos][i] value
+        for i in range(self.dimension):
+            if v[i] is False and graph[currPos][i]:
+                if cost + graph[currPos][i] < best_sol[0]:
+                    # Mark as visited
+                    v[i] = True
+                    self.tsp_backtracking_dfbb(graph, v, i, n, count + 1, cost + graph[currPos][i],
+                                               answer, path + "->" + str(i + 1), all_paths, best_sol)
+
+                    # Mark ith node as unvisited
+                    v[i] = False
 
     # CALCULA LA LONGITUD DE LA RUTA ACTUAL DEL PROBLEMA
     def compute_dist(self):
@@ -203,7 +233,7 @@ class TSP:
     # CALCULA LA DISTANCIA ENTRE DOS CIUDADES
     def distance(self, city1, city2):
         return math.sqrt((self.problema[city1][0] - self.problema[city2][0]) ** 2 + (
-                    self.problema[city1][1] - self.problema[city2][1]) ** 2)
+                self.problema[city1][1] - self.problema[city2][1]) ** 2)
 
     # DESPLAZA LA SOLUCION PARA QUE LA RUTA COMIENCE POR LA PRIMERA CIUDAD
     def ordenar_solucion(self):
@@ -245,7 +275,7 @@ class TSP:
             plt.plot(x_values, y_values, 'red')
         plt.suptitle(f'{self.nombre} con solucion', fontsize=14)
         plt.title('Ruta: ' + ', '.join(map(str, self.solution + [self.solution[0]])), fontsize=10)
-        #plt.show() #En algunos casos necesitareis descomentar esta linea para que se vean las figuras generadas
+        # plt.show() #En algunos casos necesitareis descomentar esta linea para que se vean las figuras generadas
 
     def __str__(self):
         result = f'Problema {self.nombre}\n\t-{self.dimension} ciudades'
