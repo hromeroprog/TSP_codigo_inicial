@@ -6,12 +6,13 @@ Created on Tue May  4 12:02:52 2021
 """
 
 from TSP import TSP
+from profundidad_y_poda import branchAndBound
 
 if __name__ == '__main__':
     tsp = TSP() #Crear el objeto
-    fichero = "ulysses22.tsp"
-    tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
-    #tsp.obtener_random(11) #Genera un escenario aleatorio de la dimension que le pases
+    # fichero = "ulysses22.tsp"
+    # tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
+    tsp.obtener_random(11) #Genera un escenario aleatorio de la dimension que le pases
     
     tsp.greedy_solve() #Genera una solucion de ruta
     tsp.draw_with_solution() #dibujar la solucion
@@ -27,6 +28,11 @@ if __name__ == '__main__':
     tsp.aplicar_mejor_solucion_desde_archivo()
     tsp.draw_with_solution()
     
+    tsp.shuffle()
+    
+    tsp.draw_with_solution()
+    branchAndBound(tsp)
+    tsp.draw_with_solution()
     
     
     # No se recomienda probar el backtracking con el archivo .tsp,
