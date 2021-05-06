@@ -6,10 +6,9 @@ Created on Tue May  4 12:43:59 2021
 """
 
 from matplotlib import pyplot as plt
-from tools import angle, read_file
+from tools import read_file
 import random
 import math
-import numpy as np
 import time
 
 
