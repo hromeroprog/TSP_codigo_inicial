@@ -43,6 +43,8 @@ def TSPRec(tsp: TSP,curr_weight, level, curr_path, visited, final_path, final_re
                     visited[curr_path[j]] = True
   
 #Adaptación realizada por Hugo Romero sobre el código de ng24_7 en geeksforgeeks
+#Ejecuta el algoritmo de ramificacion y poda (branch and bound) con heuristica
+#por determinar (trabajo de cada grupo).
 def branchAndBound(tsp):
     start = time.time()
     final_path = [None] * (tsp.dimension + 1)
