@@ -147,6 +147,14 @@ class TSP:
         return end - start
 
     def backtracking_solve(self):
+        """
+        Método realizada por:
+            - Hugo Romero
+            - - Grupo 10: Ramsés Contreras, Alejandro de la Vega, Ricardo Grande
+        Calls backtracking method and stores solution's path and minimum weight. Calls for optimized
+        backtracking are commented.
+        :return: backtracking execution time
+        """
         answer = []
         paths = []
         graph = self.graph.copy()
@@ -182,6 +190,22 @@ class TSP:
         return end - start
 
     def tsp_backtracking(self, graph, v, currPos, n, count, cost, answer, path, all_paths):
+        """
+        Adaptación realizada por:
+            - Hugo Romero
+            - Grupo 10: Ramsés Contreras, Alejandro de la Vega, Ricardo Grande
+        sobre el código de Mohit Kumar en geeksforgeeks.org
+        :param graph: matriz representando el grafo del problema
+        :param v: vector booleano de nodos, true si han sido visitados, false si no.
+        :param currPos: nodo actual
+        :param n: número total de nodos
+        :param count: número de nodos visitados
+        :param cost: coste acumulado
+        :param answer: lista con el coste de todas las soluciones encontradas
+        :param path: recorrido local de la rama
+        :param all_paths: lista con los recorridos de todas las soluciones encontradas
+        :return:
+        """
         if count == n and graph[currPos][0]:
             answer.append(cost + graph[currPos][0])
             # Append local path to all_paths (stores all solutions' paths)
@@ -201,11 +225,28 @@ class TSP:
                 # Mark ith node as unvisited
                 v[i] = False
 
-    def tsp_backtracking_dfbb(self, graph, v, currPos, n, count, cost, answer, path, all_paths, best_sol):
+    def tsp_backtracking_dfbnb(self, graph, v, currPos, n, count, cost, answer, path, all_paths, best_sol):
+        """
+        Adaptación realizada por:
+            - Grupo 10: Ramsés Contreras, Alejandro de la Vega, Ricardo Grande
+        sobre el código de Mohit Kumar en geeksforgeeks.org para incluir la mejora de poda.
+        :param graph: matriz representando el grafo del problema
+        :param v: vector booleano de nodos, true si han sido visitados, false si no.
+        :param currPos: nodo actual
+        :param n: número total de nodos
+        :param count: número de nodos visitados
+        :param cost: coste acumulado
+        :param answer: lista con el coste de todas las soluciones encontradas
+        :param path: recorrido local de la rama
+        :param all_paths: lista con los recorridos de todas las soluciones encontradas
+        :param best_sol: almacena la mejor solución encontrada hasta el momento
+        :return:
+        """
         if count == n and graph[currPos][0]:
             answer.append(cost + graph[currPos][0])
             # Append local path to all_paths (stores all solutions' paths)
             all_paths.append(path)
+            # Updates best solution found
             best_sol[0] = (cost + graph[currPos][0])
             return
         # BACKTRACKING STEP
@@ -214,11 +255,12 @@ class TSP:
         # by 1 and cost by graph[currPos][i] value
         for i in range(self.dimension):
             if v[i] is False and graph[currPos][i]:
+                # Expand only if current branch has lower weight than best solution found so far
                 if cost + graph[currPos][i] < best_sol[0]:
                     # Mark as visited
                     v[i] = True
-                    self.tsp_backtracking_dfbb(graph, v, i, n, count + 1, cost + graph[currPos][i],
-                                               answer, path + "->" + str(i + 1), all_paths, best_sol)
+                    self.tsp_backtracking_dfbnb(graph, v, i, n, count + 1, cost + graph[currPos][i],
+                                                answer, path + "->" + str(i + 1), all_paths, best_sol)
 
                     # Mark ith node as unvisited
                     v[i] = False
