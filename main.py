@@ -9,7 +9,7 @@ from TSP import TSP
 
 if __name__ == '__main__':
     tsp = TSP() #Crear el objeto
-    fichero = "ulysses16.tsp"
+    fichero = "ulysses22.tsp"
     tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
     #tsp.obtener_random(12) #Genera un escenario aleatorio de la dimension que le pases
     

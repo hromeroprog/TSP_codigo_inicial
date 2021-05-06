@@ -54,10 +54,12 @@ class TSP:
         index_for_search = [index for index, line in enumerate(lines) if 'TOUR_SECTION' in line][0] + 1
         
         next_line = lines[index_for_search]
+        #if else porque a veces la solucion a parece en una sola linea y a veces en varias
         if sum([str(city) in next_line for city in self.solution]) == self.dimension:
             self.solution = list(map(int, next_line.split(' ')))
         else:
-            self.solution = lines[index_for_search:index_for_search + self.dimension]
+            self.solution = list(map(int,lines[index_for_search:index_for_search + self.dimension]))
+            print(self.solution)
         self.ordenar_solucion()
         print(f'Solucion desde archivo: {self.compute_dist()} m')
         
