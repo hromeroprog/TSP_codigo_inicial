@@ -4,18 +4,19 @@ Created on Tue May  4 12:43:59 2021
 
 @author: 2rome
 """
-import copy
 
 from matplotlib import pyplot as plt
 from tools import angle, read_file
 import random
 import math
 import numpy as np
+import time
 
 
 class TSP:
     def __init__(self):
         self.nombre = ''
+        self.filename = ''
         self.dimension = 0
         self.problema = {}
         self.solution = []
@@ -31,6 +32,7 @@ class TSP:
         tsp_file = f"./TSP_interesantes/{tsp_name}"
         lines = read_file(tsp_file)
         self.nombre = [line.partition('NAME:')[2] for line in lines if 'NAME: ' in line][0].strip()
+        self.filename = tsp_name
         self.dimension = int([line.partition('DIMENSION:')[2] for line in lines if 'DIMENSION: ' in line][0])
         index_for_search = [index for index, line in enumerate(lines) if 'NODE_COORD_SECTION' in line][0] + 1
         cities_data = lines[index_for_search:index_for_search + self.dimension]
@@ -40,7 +42,25 @@ class TSP:
             self.problema[int(idx)] = (x, y)
 
         self.generate_graph()
+        self.solution = list(self.problema.keys())
         print(f'Fichero {tsp_name} parseado con exito')
+    
+    def aplicar_mejor_solucion_desde_archivo(self):
+        if '.tsp'not in self.filename:
+            print(f'El escenario {self.nombre} no fue generado apartir de un archivo .tsp')
+            return
+        solution_file = "./TSP_interesantes/" + self.filename.replace('.tsp', '') + ".opt.tour"
+        lines = read_file(solution_file)
+        index_for_search = [index for index, line in enumerate(lines) if 'TOUR_SECTION' in line][0] + 1
+        
+        next_line = lines[index_for_search]
+        if sum([str(city) in next_line for city in self.solution]) == self.dimension:
+            self.solution = list(map(int, next_line.split(' ')))
+        else:
+            self.solution = lines[index_for_search:index_for_search + self.dimension]
+        self.ordenar_solucion()
+        print(f'Solucion desde archivo: {self.compute_dist()} m')
+        
 
     # GENERA UN ESCENARIO ALEATORIO DE {dimension} CIUDADES
     def obtener_random(self, dimension):
@@ -50,21 +70,21 @@ class TSP:
         for i in range(1, dimension + 1):
             self.problema[i] = round(random.random() * 50, 2), round(random.random() * 50, 2)
         self.generate_graph()
-
-    # POR IMPLEMENTAR, DE MOMENTO HACE UNA SOLUCION ALEATORIA
-    def solve(self):
         self.solution = list(self.problema.keys())
+
+    #PARA DESORDENAR LAS CIUDADES DE LA SOLUCION
+    #puede ser util para evaluar varias soluciones sobre un mismo escenario
+    #pero que una soluciones no influyan sobre las otras
+    def shuffle(self):
         random.shuffle(self.solution)
         self.ordenar_solucion()
 
     # SOLUCION CON ALGORITMO GREEDY
     def greedy_solve(self):
-        self.solution = list(self.problema.keys())
+        start = time.time()
         to_put = set(self.solution)
-
         new_solution = [self.solution[0]]
         to_put.remove(self.solution[0])
-
         while (len(to_put) > 1):
             current = new_solution[-1]
             current_distance = float('inf')
@@ -79,23 +99,28 @@ class TSP:
             new_solution.append(current_best)
             to_put.remove(current_best)
         new_solution.append(to_put.pop())
-
         self.solution = new_solution
-        self.ordenar_solucion()  # Puede que haya que quitarlo para estudiar la complejidad
+        end = time.time()
+        self.ordenar_solucion()
         print(f'Solución greedy generada: {self.compute_dist()}m')
+        return end-start
 
-    # SOLUCION CON ALGORITMO BASADO EN GRADOS RESPECTO AL CENTRO
+    # SOLUCION CON ALGORITMO BASADO EN GRADOS RESPECTO AL CENTRO, FUNCIONA BIEN COMBINADO CON 2-OPT
     def r_solve(self):
+        start = time.time()
         x = [coord[0] for coord in self.problema.values()]
         y = [coord[1] for coord in self.problema.values()]
 
         center = [np.mean(x), np.mean(y)]
         self.solution.sort(key=lambda point: angle(self.problema[point], center))
+        end = time.time()
+        self.ordenar_solucion()
         print(f'Solucion r: {self.compute_dist()} m')
-        self.ordenar_solucion()  # Puede que haya que quitarlo para estudiar la complejidad
-        print(f'Solucion r: {self.compute_dist()} m')
+        return end-start
+        
     
     def opt2(self):
+        start = time.time()
         improved = True
         while improved:
             improved = False
@@ -115,9 +140,14 @@ class TSP:
                         break
                 if improved:
                     break
+        end = time.time()
+        self.ordenar_solucion()
         print(f'Solucion 2-opt: {self.compute_dist()} m')
+        return end-start
+        
     
     def backtracking_solve(self):
+        start = time.time()
         answer = []
         paths = []
         graph = self.graph.copy()
@@ -135,7 +165,10 @@ class TSP:
 
         # Splits solution by separator and converts each element to int to be stored as a list of ints
         self.solution = [int(x) for x in paths[answer.index(min(answer))].split("->")]
-        print(self.solution)
+        end = time.time()
+        self.ordenar_solucion()
+        print(f'Solucion backtracking: {self.compute_dist()} m')
+        return end-start
 
     def tsp_backtracking(self, graph, v, currPos, n, count, cost, answer, path, all_paths):
         if count == n and graph[currPos][0]:
@@ -209,10 +242,9 @@ class TSP:
             plt.plot(x_values, y_values, 'red')
         plt.suptitle(f'{self.nombre} con solucion', fontsize=14)
         plt.title('Ruta: ' + ', '.join(map(str, self.solution + [self.solution[0]])), fontsize=10)
-        #plt.show()
+        #plt.show() #En algunos casos necesitareis descomentar esta linea para que se vean las figuras generadas
 
     def __str__(self):
-        result = f'Problema de {self.dimension} ciudades:'
-        for city in self.problema.keys():
-            result += f'\n{city}: {self.problema[city]}'
+        result = f'Problema {self.nombre}\n\t-{self.dimension} ciudades'
+        result += f"\n\t-Actual solucion:\t{', '.join(map(str, self.solution))}"
         return result

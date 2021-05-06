@@ -9,9 +9,9 @@ from TSP import TSP
 
 if __name__ == '__main__':
     tsp = TSP() #Crear el objeto
-    #fichero = "ulysses16.tsp"
-    #tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
-    tsp.obtener_random(12) #Genera un escenario aleatorio de la dimension que le pases
+    fichero = "ulysses16.tsp"
+    tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
+    #tsp.obtener_random(12) #Genera un escenario aleatorio de la dimension que le pases
     
     tsp.greedy_solve() #Genera una solucion de ruta
     tsp.draw_with_solution() #dibujar la solucion
@@ -23,5 +23,15 @@ if __name__ == '__main__':
     tsp.r_solve() #Genera una solucion de ruta
     tsp.opt2()
     tsp.draw_with_solution() #dibujar la solucion
-    #tsp.backtracking_solve()
+    
+    tsp.aplicar_mejor_solucion_desde_archivo()
+    tsp.draw_with_solution()
+    
+    
+    
+    #No se recomienda probar el backtracking con el archivo .tsp, 
+    #si este tiene demasiadas dimensiones empezar con generaciones
+    #aleatorias y tratar de reducir la computacion con podas y/o heuristicas. 
+    
+    #tsp.backtracking_solve() 
     #tsp.draw_with_solution()
