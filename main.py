@@ -11,12 +11,17 @@ if __name__ == '__main__':
     tsp = TSP() #Crear el objeto
     #fichero = "ulysses16.tsp"
     #tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
-    tsp.obtener_random(11) #Genera un escenario aleatorio de la dimension que le pases
-    #tsp.greedy_solve() #Genera una solucion de ruta
-    #tsp.draw_with_solution() #dibujar la solucion
-    #tsp.draw() #dibujar solo las ciudades
+    tsp.obtener_random(12) #Genera un escenario aleatorio de la dimension que le pases
     
-    # tsp.r_solve() #Genera una solucion de ruta
-    # tsp.draw_with_solution() #dibujar la solucion
-    tsp.backtracking_solve()
-    tsp.draw_with_solution()
+    tsp.greedy_solve() #Genera una solucion de ruta
+    tsp.draw_with_solution() #dibujar la solucion
+    #tsp.draw() #dibujar solo las ciudades
+    tsp.opt2()
+    tsp.draw_with_solution() #dibujar la solucion
+    
+    
+    tsp.r_solve() #Genera una solucion de ruta
+    tsp.opt2()
+    tsp.draw_with_solution() #dibujar la solucion
+    #tsp.backtracking_solve()
+    #tsp.draw_with_solution()

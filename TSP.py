@@ -94,7 +94,29 @@ class TSP:
         print(f'Solucion r: {self.compute_dist()} m')
         self.ordenar_solucion()  # Puede que haya que quitarlo para estudiar la complejidad
         print(f'Solucion r: {self.compute_dist()} m')
+    
+    def opt2(self):
+        improved = True
+        while improved:
+            improved = False
+            best_distance = self.compute_dist()
+            for i in range(1, self.dimension - 2):
+                for j in range(i + 2, self.dimension):
+                    #if j - i == 1: continue  # changes nothing, skip then
+                    new_route = self.solution.copy()  # Creates a copy of route
+                    new_route[i:j] = self.solution[j - 1:i - 1:-1]  # this is the 2-optSwap since j >= i we use -1
+                    new_distance = sum([self.distance(new_route[index], new_route[(index + 1) % len(new_route)]) for index in range(len(new_route))])
 
+                    if new_distance < best_distance:
+                        self.solution = new_route
+                        best_distance = new_distance
+                        improved = True
+                    if improved:
+                        break
+                if improved:
+                    break
+        print(f'Solucion 2-opt: {self.compute_dist()} m')
+    
     def backtracking_solve(self):
         answer = []
         paths = []
@@ -114,7 +136,6 @@ class TSP:
         # Splits solution by separator and converts each element to int to be stored as a list of ints
         self.solution = [int(x) for x in paths[answer.index(min(answer))].split("->")]
         print(self.solution)
-        print(v)
 
     def tsp_backtracking(self, graph, v, currPos, n, count, cost, answer, path, all_paths):
         if count == n and graph[currPos][0]:
