@@ -119,21 +119,6 @@ class TSP:
         print(f'Solución greedy generada: {self.compute_dist()}m')
         return end - start
 
-    #Función r_solve(self) -> float implementada por Hugo Romero
-    #Solucion con un algoritmo que se me ha ocurrido que podría
-    #funcionar bien como punto de partida, funciona muy bien 
-    #combinada con el 2-opt
-    def r_solve(self):
-        start = time.time()
-        x = [coord[0] for coord in self.problema.values()]
-        y = [coord[1] for coord in self.problema.values()]
-
-        center = [np.mean(x), np.mean(y)]
-        self.solution.sort(key=lambda point: angle(self.problema[point], center))
-        end = time.time()
-        self.ordenar_solucion()
-        print(f'Solucion r: {self.compute_dist()} m')
-        return end - start
     
     #Función opt2(self) -> float implementada por Hugo Romero
     #La funcion adapta el pseudocodigo de la pagina
@@ -242,19 +227,23 @@ class TSP:
                     # Mark ith node as unvisited
                     v[i] = False
 
-    # CALCULA LA LONGITUD DE LA RUTA ACTUAL DEL PROBLEMA
+
+    #Función compute_dist(self) -> float implementada por Hugo Romero
+    #Calcula la distancia actual de la ruta solucion
     def compute_dist(self):
         total_dist = 0
         for index in range(len(self.solution)):
             total_dist += self.distance(self.solution[index], self.solution[(index + 1) % len(self.solution)])
         return total_dist
-
-    # CALCULA LA DISTANCIA ENTRE DOS CIUDADES
+    
+    #Función distance(self, int, int) -> float implementada por Hugo Romero
+    # Devuelve la distancia entre dos ciudades
     def distance(self, city1, city2):
         return math.sqrt((self.problema[city1][0] - self.problema[city2][0]) ** 2 + (
                 self.problema[city1][1] - self.problema[city2][1]) ** 2)
-
-    # DESPLAZA LA SOLUCION PARA QUE LA RUTA COMIENCE POR LA PRIMERA CIUDAD
+    
+    #Función ordenar_solucion(self) implementada por Hugo Romero
+    # Desplaza (shift) la solucion para que la ruta comience por la primera ciudad
     def ordenar_solucion(self):
         primero = None
         while (primero != list(self.problema.keys())[0]):
@@ -263,8 +252,9 @@ class TSP:
 
         self.solution = self.solution[:-1]
         self.solution.insert(0, primero)
-
-    # DIBUJA EL PROBLEMA
+    
+    #Función draw(self) implementada por Hugo Romero
+    # Dibuja el problema
     def draw(self):
         x = [coord[0] for coord in self.problema.values()]
         y = [coord[1] for coord in self.problema.values()]
@@ -283,7 +273,8 @@ class TSP:
         plt.xlim(min(x) - 1, max(x) + 1)
         plt.suptitle(f'{self.nombre} sin solucion', fontsize=14)
 
-    # DIBUJA LA SOLUCION
+    #Función draw(self) implementada por Hugo Romero
+    # Dibuja el problema con la solucion actual
     def draw_with_solution(self):
         self.draw()
         for index in range(len(self.solution)):
@@ -295,7 +286,9 @@ class TSP:
         plt.suptitle(f'{self.nombre} con solucion', fontsize=14)
         plt.title('Ruta: ' + ', '.join(map(str, self.solution + [self.solution[0]])), fontsize=10)
         # plt.show() #En algunos casos necesitareis descomentar esta linea para que se vean las figuras generadas
-
+        
+    #Función __str__(self) -> string implementada por Hugo Romero
+    # Devuelve un string del problema, con el nombre la dimension y la solucion
     def __str__(self):
         result = f'Problema {self.nombre}\n\t-{self.dimension} ciudades'
         result += f"\n\t-Actual solucion:\t{', '.join(map(str, self.solution))}"

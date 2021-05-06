@@ -13,13 +13,9 @@ def copyToFinal(curr_path, final_path, N):
     final_path[N] = curr_path[0]
 
 #Función g(TSP, list, int, int) implementada por Hugo Romero
-#funcion heuristica, modificar cuando se desee para podar las ramas
-#esta heuristica reduce unas 6 veces el tiempo de ejecucion
-def g(tsp, visited, level, adding_node): 
+#funcion heuristica, modificar para podar las ramas del algoritmo en profundidad
+def g(): 
     bound = 0
-    for i in range(tsp.dimension):
-        if not visited[i] and i != adding_node:
-            bound += min([coste for coste in tsp.graph[i] if coste > 0])
     return bound
 
 #Adaptación realizada por Hugo Romero sobre el código de ng24_7 en geeksforgeeks
@@ -34,15 +30,13 @@ def TSPRec(tsp: TSP,curr_weight, level, curr_path, visited, final_path, final_re
     for i in range(tsp.dimension): 
         if (tsp.graph[curr_path[level-1]][i] != 0 and visited[i] == False):
             curr_weight += tsp.graph[curr_path[level - 1]][i]
-            curr_bound = g(tsp, visited, level, i)
+            curr_bound = g() #Aqui se hace la llamada a la heuristica
             if curr_bound + curr_weight < final_res[0]:
-                #print(f'Bound: {curr_bound}\tWeight: {curr_weight}\tCurrentBestSol: {final_res}\tPath: {curr_path}')
                 curr_path[level] = i
                 visited[i] = True
                 TSPRec(tsp, curr_weight, level + 1, curr_path, visited, final_path, final_res)
                 
             curr_weight -= tsp.graph[curr_path[level - 1]][i]
-            # Also reset the visited array
             visited = [False] * len(visited)
             for j in range(level):
                 if curr_path[j] != -1:
