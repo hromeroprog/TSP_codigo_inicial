@@ -14,6 +14,8 @@ import time
 
 
 class TSP:
+   #Función __init__(TSP) implementada por Hugo Romero
+   #CONSTRUCTOR DE LA CLASE TSP
     def __init__(self):
         self.nombre = ''
         self.filename = ''
@@ -22,12 +24,16 @@ class TSP:
         self.solution = []
         self.figures = 0
         self.graph = []
-
+    
+    #Función generate_graph(self) implementada por Hugo Romero
+    #Calcula y almacena en graph las aristas (carreteras) entre ciudades (todas, dado que es un nodo completo)
     def generate_graph(self):
         self.graph = [[self.distance(city1, city2) for city2 in list(self.problema.keys())] for city1 in
                       list(self.problema.keys())]
-
-    # GENERA UN ESCENARIO DESDE UN ARCHIVO TSP
+    
+    #Función obtener_desde_archivo_tsp(self, string) implementada por Hugo Romero
+    # Genera un escenario a partir de un archivo .tsp, debe estar en la carpeta TSP_interesantes
+    # Se espera que sea un archivo tsp de vertices (coordenadas), no de aristas.
     def obtener_desde_archivo_tsp(self, tsp_name):
         tsp_file = f"./TSP_interesantes/{tsp_name}"
         lines = read_file(tsp_file)
@@ -44,7 +50,10 @@ class TSP:
         self.generate_graph()
         self.solution = list(self.problema.keys())
         print(f'Fichero {tsp_name} parseado con exito')
-
+    
+    #Función aplicar_mejor_solucion_desde_archivo(self) implementada por Hugo Romero
+    #Si el escenario proviene de un fichero tsp, lee la solucion del archivo de
+    #solucion correspondiente
     def aplicar_mejor_solucion_desde_archivo(self):
         if '.tsp' not in self.filename:
             print(f'El escenario {self.nombre} no fue generado apartir de un archivo .tsp')
@@ -62,8 +71,9 @@ class TSP:
             print(self.solution)
         self.ordenar_solucion()
         print(f'Solucion desde archivo: {self.compute_dist()} m')
-
-    # GENERA UN ESCENARIO ALEATORIO DE {dimension} CIUDADES
+    
+    #Función obtener_random(self, int) implementada por Hugo Romero
+    # Genera un escenario aleatorio de {dimension} CIUDADES
     def obtener_random(self, dimension):
         self.nombre = f'Aleatorio {dimension} dimensiones'
         self.dimension = dimension
@@ -72,15 +82,18 @@ class TSP:
             self.problema[i] = round(random.random() * 50, 2), round(random.random() * 50, 2)
         self.generate_graph()
         self.solution = list(self.problema.keys())
-
+    
+    #Función shuffle(self) implementada por Hugo Romero
     # PARA DESORDENAR LAS CIUDADES DE LA SOLUCION
-    # puede ser util para evaluar varias soluciones sobre un mismo escenario
+    # Puede ser util para evaluar varias soluciones sobre un mismo escenario
     # pero que una soluciones no influyan sobre las otras
     def shuffle(self):
         random.shuffle(self.solution)
         self.ordenar_solucion()
-
-    # SOLUCION CON ALGORITMO GREEDY
+    
+    #Función greedy_solve(self) -> float implementada por Hugo Romero
+    #Solucion con algoritmo greedy, la siguiente ciudad es la mas cercana no visitada
+    #Devuelve el tiempo de ejecucion del algoritmo
     def greedy_solve(self):
         start = time.time()
         to_put = set(self.solution)
@@ -106,7 +119,10 @@ class TSP:
         print(f'Solución greedy generada: {self.compute_dist()}m')
         return end - start
 
-    # SOLUCION CON ALGORITMO BASADO EN GRADOS RESPECTO AL CENTRO, FUNCIONA BIEN COMBINADO CON 2-OPT
+    #Función r_solve(self) -> float implementada por Hugo Romero
+    #Solucion con un algoritmo que se me ha ocurrido que podría
+    #funcionar bien como punto de partida, funciona muy bien 
+    #combinada con el 2-opt
     def r_solve(self):
         start = time.time()
         x = [coord[0] for coord in self.problema.values()]
@@ -118,7 +134,10 @@ class TSP:
         self.ordenar_solucion()
         print(f'Solucion r: {self.compute_dist()} m')
         return end - start
-
+    
+    #Función opt2(self) -> float implementada por Hugo Romero
+    #La funcion adapta el pseudocodigo de la pagina
+    #de wikipedia del 2-opt
     def opt2(self):
         start = time.time()
         improved = True

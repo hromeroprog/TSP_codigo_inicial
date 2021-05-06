@@ -7,19 +7,22 @@ Created on Thu May  6 12:54:23 2021
 from TSP import TSP
 import time
 
+#Adaptación realizada por Hugo Romero sobre el código de ng24_7 en geeksforgeeks
 def copyToFinal(curr_path, final_path, N):
     final_path[:N + 1] = curr_path[:]
     final_path[N] = curr_path[0]
 
-def g(tsp, visited, level, adding_node):
-    #funcion heuristica, modificar cuando se desee para limitar la poda al gusto
-    #esta heuristica reduce unas 6 veces el tiempo de ejecucion
+#Función g(TSP, list, int, int) implementada por Hugo Romero
+#funcion heuristica, modificar cuando se desee para podar las ramas
+#esta heuristica reduce unas 6 veces el tiempo de ejecucion
+def g(tsp, visited, level, adding_node): 
     bound = 0
     for i in range(tsp.dimension):
         if not visited[i] and i != adding_node:
             bound += min([coste for coste in tsp.graph[i] if coste > 0])
     return bound
 
+#Adaptación realizada por Hugo Romero sobre el código de ng24_7 en geeksforgeeks
 def TSPRec(tsp: TSP,curr_weight, level, curr_path, visited, final_path, final_res):
     if level == tsp.dimension:
         curr_res = curr_weight + tsp.graph[curr_path[level - 1]][curr_path[0]]
@@ -45,7 +48,7 @@ def TSPRec(tsp: TSP,curr_weight, level, curr_path, visited, final_path, final_re
                 if curr_path[j] != -1:
                     visited[curr_path[j]] = True
   
-    
+#Adaptación realizada por Hugo Romero sobre el código de ng24_7 en geeksforgeeks
 def branchAndBound(tsp):
     start = time.time()
     final_path = [None] * (tsp.dimension + 1)

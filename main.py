@@ -12,7 +12,7 @@ if __name__ == '__main__':
     tsp = TSP() #Crear el objeto
     # fichero = "ulysses22.tsp"
     # tsp.obtener_desde_archivo_tsp(fichero)  #Lee de un archivo .tsp
-    tsp.obtener_random(11) #Genera un escenario aleatorio de la dimension que le pases
+    tsp.obtener_random(13) #Genera un escenario aleatorio de la dimension que le pases
     
     tsp.greedy_solve() #Genera una solucion de ruta
     tsp.draw_with_solution() #dibujar la solucion
